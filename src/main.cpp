@@ -11,6 +11,7 @@
 #include "timeData.h"
 #include <globals.h>
 #include <Preferences.h>
+#include <RTClib.h>
 
 // preferences
 Preferences preferences;
@@ -30,6 +31,10 @@ const int   daylightOffset_sec = 3600;
 String timezone = "CET-1CEST,M3.5.0,M10.5.0/3";
 hw_timer_t *My_timer = NULL;
 TimeData myTimeData = TimeData();
+
+// RTC
+bool RTCAvailable = true;
+RTC_DS3231 rtc;
 
 // LED
 #define DATA_PIN    5
@@ -58,6 +63,11 @@ void IRAM_ATTR onTimer(){
 void setup() {
   // Serial
   Serial.begin(115200);
+  Wire.begin();
+  if(!rtc.begin()){
+    Serial.println("Konnte RTC nicht finden!");
+    while (1);
+  }
   // LEDS
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(brightness);
@@ -100,6 +110,13 @@ void setup() {
   }
 
   //preferences.putString("password", password);
+    // Überprüfe, ob die RTC die aktuelle Zeit hat, andernfalls setze sie auf die Systemzeit
+  if (rtc.lostPower()) {
+    DateTime now = rtc.now();
+    Serial.println(now.timestamp(DateTime::TIMESTAMP_FULL));
+    Serial.println("RTC hat die Zeit verloren! Setze die Zeit auf die Systemzeit.");
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  }
   initTime(timezone);
 
   // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -122,6 +139,20 @@ void loop() {
     if(hue == 255){
       hue = 0;
     }
+  }
+  EVERY_N_SECONDS(5){
+    DateTime now = rtc.now();
+    Serial.print(now.day());
+    Serial.print(".");
+    Serial.print(now.month());
+    Serial.print(".");
+    Serial.print(now.year());
+    Serial.print(" ");
+    Serial.print(now.hour());
+    Serial.print(":");
+    Serial.print(now.minute());
+    Serial.print(":");
+    Serial.println(now.second());
   }
 }
 
@@ -228,17 +259,19 @@ void animationSuccess(){
 }
 
 void initTime(String timezone){
-  struct tm timeinfo;
+  if (!APMode){
+    struct tm timeinfo;
 
-  Serial.println("Setting up time");
-  configTime(0, 0, "pool.ntp.org");    // First connect to NTP server, with 0 TZ offset
-  if(!getLocalTime(&timeinfo)){
-    Serial.println("  Failed to obtain time");
-    return;
+    Serial.println("Setting up time");
+    configTime(0, 0, "pool.ntp.org");    // First connect to NTP server, with 0 TZ offset
+    if(!getLocalTime(&timeinfo)){
+      Serial.println("  Failed to obtain time");
+      return;
+    }
+    Serial.println("  Got the time from NTP");
+    // Now we can set the real timezone
+    setTimezone(timezone);
   }
-  Serial.println("  Got the time from NTP");
-  // Now we can set the real timezone
-  setTimezone(timezone);
 }
 
 void setTimezone(String timezone){

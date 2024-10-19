@@ -8,10 +8,12 @@
 #include <AsyncElegantOTA.h>
 #include <DNSServer.h>
 #include <Preferences.h>
+#include <RTClib.h>
 
 extern Preferences preferences;
 
 // WIFi
+extern bool APMode = false;
 extern String ssid;
 extern String password;
 extern DNSServer dnsServer;
@@ -26,6 +28,10 @@ extern const int   daylightOffset_sec;
 extern String timezone;
 extern hw_timer_t *My_timer;
 extern TimeData myTimeData;
+
+// RTC
+extern bool RTCAvailable;
+extern RTC_DS3231 rtc;
 
 // LED
 #define DATA_PIN    5

@@ -4,6 +4,7 @@
 #include <time.h>
 #include <globals.h>
 #include <FastLED.h>
+#include <RTClib.h>
 
 TimeData::TimeData(){
     hour = 0;
@@ -57,13 +58,13 @@ void TimeData::loop(){
     }
     if(showMinute){
         displayMinute();
-        printActiveLEDs();
+        //printActiveLEDs();
         showMinute=false;
     }
     if(showTime){
         displayTime();
         printTime();
-        printActiveLEDs();
+        //printActiveLEDs();
         showTime = false;
     }
     animate();
@@ -495,20 +496,47 @@ void TimeData::printTime(){
 }
 
 void TimeData::syncTime(){
-struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
-        Serial.println("Failed to obtain time 1");
-        return;
+    if (!APMode){
+        struct tm timeinfo;
+        if(!getLocalTime(&timeinfo)){
+            Serial.println("Failed to obtain time 1");
+            return;
+        }
+        int secondsoff = (timeinfo.tm_hour-hour)*3600;
+        secondsoff += (timeinfo.tm_min-minute)*60;
+        secondsoff += timeinfo.tm_sec-second;
+        hour = timeinfo.tm_hour;
+        minute = timeinfo.tm_min;
+        second = timeinfo.tm_sec;
+        Serial.print("synchonized time, time was wrong by ");
+        Serial.print(secondsoff);
+        Serial.println("s");
+
+        if (RTCAvailable){
+           Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+            Serial.print(timeinfo.tm_mday);
+            Serial.print(".");
+            Serial.print(timeinfo.tm_mon+1);
+            Serial.print(".");
+            Serial.print(timeinfo.tm_year+1900);
+            Serial.print(" ");
+            Serial.print(timeinfo.tm_hour);
+            Serial.print(":");
+            Serial.print(timeinfo.tm_min);
+            Serial.print(":");
+            Serial.println(timeinfo.tm_sec);
+            DateTime dt = DateTime(timeinfo.tm_year+1900,timeinfo.tm_mon+1,timeinfo.tm_mday,timeinfo.tm_hour,timeinfo.tm_min,timeinfo.tm_sec);
+            rtc.adjust(dt); 
+        }
+    }else{
+        // use rtc time if available
+        if (RTCAvailable){
+            DateTime now = rtc.now();
+            hour = now.hour();
+            minute = now.minute();
+            second = now.second();
+        }
     }
-    int secondsoff = (timeinfo.tm_hour-hour)*3600;
-    secondsoff += (timeinfo.tm_min-minute)*60;
-    secondsoff += timeinfo.tm_sec-second;
-    hour = timeinfo.tm_hour;
-    minute = timeinfo.tm_min;
-    second = timeinfo.tm_sec;
-    Serial.print("synchonized time, time was wrong by ");
-    Serial.print(secondsoff);
-    Serial.println("s");
 }
 
 String TimeData::getTimeString(){
