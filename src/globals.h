@@ -38,6 +38,7 @@ extern RTC_DS3231 rtc;
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 #define NUM_LEDS 228
+#define num_leds_per_letter 2
 extern CRGB leds[NUM_LEDS];
 extern bool updatedLEDs[NUM_LEDS];
 extern bool activeLEDs[NUM_LEDS];

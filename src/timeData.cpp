@@ -161,7 +161,6 @@ void TimeData::animate(){
         bool activeSection = false;
         CRGB colors[NUM_LEDS];
         CRGB color;
-        int delta = 100;
         // generate new colors
         for(int i=0; i<NUM_LEDS; i++){
             if(updatedLEDs[i]){
@@ -204,7 +203,7 @@ void TimeData::animate(){
     }
     if(design == "Rainbow"){
         uint8_t numLEDsToFill = 0;
-        for(int i=0; i<NUM_LEDS-8; i++){ // ignore minute leds
+        for(int i=0; i<NUM_LEDS-4*num_leds_per_letter; i++){ // ignore minute leds
             if(activeLEDs[i]){
                 numLEDsToFill++;
             }
@@ -223,7 +222,7 @@ void TimeData::animate(){
                 leds[i] = CRGB::Black;
             }
         }
-        for(int i = NUM_LEDS-8;i<NUM_LEDS;i++){
+        for(int i = NUM_LEDS-4*num_leds_per_letter;i<NUM_LEDS;i++){
             if(activeLEDs[i]){
                 leds[i] = CHSV(hue,255,255);
             }
@@ -256,7 +255,7 @@ void TimeData::displayMinute(){
     default:
         break;
     }
-    for(int i = NUM_LEDS-8;i<NUM_LEDS-index;i++){
+    for(int i = NUM_LEDS-4*num_leds_per_letter;i<NUM_LEDS-index;i++){
         if(!activeLEDs[i]){
             activeLEDs[i] = state;
             updatedLEDs[i] = true;
@@ -294,13 +293,15 @@ void TimeData::displayTime(){
     displayMinute();
     // ES
     for(int i=0; i<sizeof(es)/sizeof(es[0]); i++){
-        setLED(es[i]*2,true);
-        setLED(es[i]*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED(es[i]*num_leds_per_letter+j,true);
+        }
     }
     // ist
     for(int i=0; i<sizeof(ist)/sizeof(ist[0]); i++){
-        setLED(ist[i]*2,true);
-        setLED(ist[i]*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED(ist[i]*num_leds_per_letter+j,true);
+        }
     }
     bool timeShift = false;
     if(0 <= minute < 5){
@@ -309,86 +310,101 @@ void TimeData::displayTime(){
     if(5 <= minute && minute < 10){
         // fünf nach
         for(int i=0; i<sizeof(fuenf)/sizeof(fuenf[0]); i++){
-            setLED(fuenf[i]*2,true);
-            setLED(fuenf[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(fuenf[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(nach)/sizeof(nach[0]); i++){
-            setLED(nach[i]*2,true);
-            setLED(nach[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(nach[i]*num_leds_per_letter+j,true);
+            }
         }
     }
     if(10 <= minute && minute < 15){
         // Zehn nach
         for(int i=0; i<sizeof(zehn)/sizeof(zehn[0]); i++){
-            setLED(zehn[i]*2,true);
-            setLED(zehn[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(zehn[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(nach)/sizeof(nach[0]); i++){
-            setLED(nach[i]*2,true);
-            setLED(nach[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(nach[i]*num_leds_per_letter+j,true);
+            }
         }
     }
     if(15 <= minute && minute < 20){
         // Viertel
         for(int i=0; i<sizeof(viertel)/sizeof(viertel[0]); i++){
-            setLED(viertel[i]*2,true);
-            setLED(viertel[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(viertel[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
     if(20 <= minute && minute < 25){
         // Zehn vor halber
         for(int i=0; i<sizeof(zehn)/sizeof(zehn[0]); i++){
-            setLED(zehn[i]*2,true);
-            setLED(zehn[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(zehn[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(vor)/sizeof(vor[0]); i++){
-            setLED(vor[i]*2,true);
-            setLED(vor[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(vor[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(halb)/sizeof(halb[0]); i++){
-            setLED(halb[i]*2,true);
-            setLED(halb[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(halb[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
     if(25 <= minute && minute < 30){
         // Fünf vor halb
         for(int i=0; i<sizeof(fuenf)/sizeof(fuenf[0]); i++){
-            setLED(fuenf[i]*2,true);
-            setLED(fuenf[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(fuenf[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(vor)/sizeof(vor[0]); i++){
-            setLED(vor[i]*2,true);
-            setLED(vor[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(vor[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(halb)/sizeof(halb[0]); i++){
-            setLED(halb[i]*2,true);
-            setLED(halb[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(halb[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
     if(30 <= minute && minute < 35){
         // halb
         for(int i=0; i<sizeof(halb)/sizeof(halb[0]); i++){
-            setLED(halb[i]*2,true);
-            setLED(halb[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(halb[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
     if(35 <= minute && minute < 40){
         // fünf nach halb
         for(int i=0; i<sizeof(fuenf)/sizeof(fuenf[0]); i++){
-            setLED(fuenf[i]*2,true);
-            setLED(fuenf[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(fuenf[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(nach)/sizeof(nach[0]); i++){
-            setLED(nach[i]*2,true);
-            setLED(nach[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(nach[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(halb)/sizeof(halb[0]); i++){
-            setLED(halb[i]*2,true);
-            setLED(halb[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(halb[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
@@ -397,42 +413,50 @@ void TimeData::displayTime(){
         if(r <=2){
             // fünf vor dreiviertel
             for(int i=0; i<sizeof(fuenf)/sizeof(fuenf[0]); i++){
-                setLED(fuenf[i]*2,true);
-                setLED(fuenf[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(fuenf[i]*num_leds_per_letter+j,true);
+                }
             }
             for(int i=0; i<sizeof(vor)/sizeof(vor[0]); i++){
-                setLED(vor[i]*2,true);
-                setLED(vor[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(vor[i]*num_leds_per_letter+j,true);
+                }
             }
             for(int i=0; i<sizeof(dreiviertel)/sizeof(dreiviertel[0]); i++){
-                setLED(dreiviertel[i]*2,true);
-                setLED(dreiviertel[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(dreiviertel[i]*num_leds_per_letter+j,true);
+                }
             }
             timeShift = true;
         }else if(2<r<3){
             // Zehn nach halber
             for(int i=0; i<sizeof(zehn)/sizeof(zehn[0]); i++){
-                setLED(zehn[i]*2,true);
-                setLED(zehn[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(zehn[i]*num_leds_per_letter+j,true);
+                }
             }
             for(int i=0; i<sizeof(nach)/sizeof(nach[0]); i++){
-                setLED(nach[i]*2,true);
-                setLED(nach[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(nach[i]*num_leds_per_letter+j,true);
+                }
             }
             for(int i=0; i<sizeof(halb)/sizeof(halb[0]); i++){
-                setLED(halb[i]*2,true);
-                setLED(halb[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(halb[i]*num_leds_per_letter+j,true);
+                }
             }
             timeShift = true;
         }else{
             // zwanzig vor
             for(int i=0; i<sizeof(zwanzig)/sizeof(zwanzig[0]); i++){
-                setLED(zwanzig[i]*2,true);
-                setLED(zwanzig[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(zwanzig[i]*num_leds_per_letter+j,true);
+                }
             }
             for(int i=0; i<sizeof(vor)/sizeof(vor[0]); i++){
-                setLED(vor[i]*2,true);
-                setLED(vor[i]*2+1,true);
+                for (int j=0;j<num_leds_per_letter;j++){
+                    setLED(vor[i]*num_leds_per_letter+j,true);
+                }
             }
             timeShift = true;
         }
@@ -440,20 +464,23 @@ void TimeData::displayTime(){
     if(45 <= minute && minute < 50){
         // Dreiviertel
         for(int i=0; i<sizeof(dreiviertel)/sizeof(dreiviertel[0]); i++){
-            setLED(dreiviertel[i]*2,true);
-            setLED(dreiviertel[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(dreiviertel[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
         if(50 <= minute && minute < 55){
         // zehn vor
         for(int i=0; i<sizeof(zehn)/sizeof(zehn[0]); i++){
-            setLED(zehn[i]*2,true);
-            setLED(zehn[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(zehn[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(vor)/sizeof(vor[0]); i++){
-            setLED(vor[i]*2,true);
-            setLED(vor[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(vor[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
@@ -461,12 +488,14 @@ void TimeData::displayTime(){
         // fünf vor
         
         for(int i=0; i<sizeof(fuenf)/sizeof(fuenf[0]); i++){
-            setLED(fuenf[i]*2,true);
-            setLED(fuenf[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(fuenf[i]*num_leds_per_letter+j,true);
+            }
         }
         for(int i=0; i<sizeof(vor)/sizeof(vor[0]); i++){
-            setLED(vor[i]*2,true);
-            setLED(vor[i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(vor[i]*num_leds_per_letter+j,true);
+            }
         }
         timeShift = true;
     }
@@ -479,8 +508,9 @@ void TimeData::displayTime(){
     HourCorrected = HourCorrected % 12;
     for(int i=0; i<sizeof(zeitNames[HourCorrected])/sizeof(zeitNames[HourCorrected][0]); i++){
         if(zeitNames[HourCorrected][i] != -1){
-            setLED(zeitNames[HourCorrected][i]*2,true);
-            setLED(zeitNames[HourCorrected][i]*2+1,true);
+            for (int j=0;j<num_leds_per_letter;j++){
+                setLED(zeitNames[HourCorrected][i]*num_leds_per_letter+j,true);
+            }
         }
     }
 }
@@ -692,270 +722,370 @@ void TimeData::displayDigit(uint8_t digit, uint8_t position){
     switch (digit)
     {
     case 0:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((43-position)*2,true);
-        setLED((43-position)*2+1,true);
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((43-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((65-position)*2,true);
-        setLED((65-position)*2+1,true);
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((65-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((66+position)*2,true);
-        setLED((66+position)*2+1,true);
-        setLED((67+position)*2,true);
-        setLED((67+position)*2+1,true);
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((66+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((67+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 1:
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
-
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
-
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
-
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
-
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 2:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((45+position)*2,true);
-        setLED((45+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((45+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((65-position)*2,true);
-        setLED((65-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((65-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((66+position)*2,true);
-        setLED((66+position)*2+1,true);
-        setLED((67+position)*2,true);
-        setLED((67+position)*2+1,true);
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((66+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((67+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 3:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+         for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((45+position)*2,true);
-        setLED((45+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((45+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((66+position)*2,true);
-        setLED((66+position)*2+1,true);
-        setLED((67+position)*2,true);
-        setLED((67+position)*2+1,true);
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((66+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((67+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 4:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((43-position)*2,true);
-        setLED((43-position)*2+1,true);
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((43-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((45+position)*2,true);
-        setLED((45+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((45+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
 
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
+
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 5:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((43-position)*2,true);
-        setLED((43-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((43-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((45+position)*2,true);
-        setLED((45+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((45+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((66+position)*2,true);
-        setLED((66+position)*2+1,true);
-        setLED((67+position)*2,true);
-        setLED((67+position)*2+1,true);
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((66+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((67+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 6:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((43-position)*2,true);
-        setLED((43-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((43-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((45+position)*2,true);
-        setLED((45+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((45+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((65-position)*2,true);
-        setLED((65-position)*2+1,true);
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((65-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((66+position)*2,true);
-        setLED((66+position)*2+1,true);
-        setLED((67+position)*2,true);
-        setLED((67+position)*2+1,true);
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((66+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((67+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 7:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 8:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((43-position)*2,true);
-        setLED((43-position)*2+1,true);
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((43-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((45+position)*2,true);
-        setLED((45+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((45+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((65-position)*2,true);
-        setLED((65-position)*2+1,true);
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((65-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((66+position)*2,true);
-        setLED((66+position)*2+1,true);
-        setLED((67+position)*2,true);
-        setLED((67+position)*2+1,true);
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((66+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((67+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     case 9:
-        setLED((22+position)*2,true);
-        setLED((22+position)*2+1,true);
-        setLED((23+position)*2,true);
-        setLED((23+position)*2+1,true);
-        setLED((24+position)*2,true);
-        setLED((24+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((22+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((23+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((24+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((43-position)*2,true);
-        setLED((43-position)*2+1,true);
-        setLED((41-position)*2,true);
-        setLED((41-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((43-position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((41-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((44+position)*2,true);
-        setLED((44+position)*2+1,true);
-        setLED((45+position)*2,true);
-        setLED((45+position)*2+1,true);
-        setLED((46+position)*2,true);
-        setLED((46+position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((44+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((45+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((46+position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((63-position)*2,true);
-        setLED((63-position)*2+1,true);
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((63-position)*num_leds_per_letter+j,true);
+        }
 
-        setLED((66+position)*2,true);
-        setLED((66+position)*2+1,true);
-        setLED((67+position)*2,true);
-        setLED((67+position)*2+1,true);
-        setLED((68+position)*2,true);
-        setLED((68+position)*2+1,true);
+       for (int j=0;j<num_leds_per_letter;j++){
+            setLED((66+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((67+position)*num_leds_per_letter+j,true);
+        }
+        for (int j=0;j<num_leds_per_letter;j++){
+            setLED((68+position)*num_leds_per_letter+j,true);
+        }
         break;
     default:
         break;
