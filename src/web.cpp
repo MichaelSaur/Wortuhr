@@ -6,6 +6,7 @@
 #include <DNSServer.h>
 #include <globals.h>
 #include <timeData.h>
+#include "SPIFFS.h"
 
 String getIndexHTML();
 
@@ -97,6 +98,13 @@ void setupServer(){
         FastLED.setBrightness(brightness);
         myTimeData.updateColor();
         request->redirect("/");
+    });
+    // Route for root / web page
+    server.on("/js/jquery.min.js", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(SPIFFS, "/jquery.min.js", "application/javascript");
+    });
+    server.on("/js/iro.js", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(SPIFFS, "/iro.js", "application/javascript");
     });
 }
 

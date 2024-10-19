@@ -167,10 +167,7 @@ void TimeData::animate(){
                 numUpdates++;
                 if(activeLEDs[i] && !activeSection){
                     activeSection = true;
-                    do{
-                        //color = CRGB(random(0,255),random(0,255),random(0,255));
-                        color = CHSV(random(0,255),255,255);
-                    }while(color.r+color.g+color.b>128);
+                    color = CHSV(random(0,255),255,255);
                 }
                 colors[i] = color;
             }else{
@@ -241,13 +238,13 @@ void TimeData::displayMinute(){
         state = false;
         break;
     case 1:
-        index = 6;
+        index = 3*num_leds_per_letter;
         break;
     case 2:
-        index = 4;
+        index = 2*num_leds_per_letter;
         break;
     case 3:
-        index = 2;
+        index = num_leds_per_letter;
         break;
     case 4:
         index = 0;

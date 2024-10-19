@@ -12,6 +12,7 @@
 #include <globals.h>
 #include <Preferences.h>
 #include <RTClib.h>
+#include "SPIFFS.h"
 
 // preferences
 Preferences preferences;
@@ -48,6 +49,9 @@ CRGB baseColor;
 String design; // Solid, Rainbow, Palette, Random
 uint8_t hue = 0;
 
+// Web
+
+
 // Functions
 void connectWiFi(String ssid, String password);
 void enableAP();
@@ -68,6 +72,10 @@ void setup() {
     Serial.println("Konnte RTC nicht finden!");
     while (1);
   }
+  if(!SPIFFS.begin(true)){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
   // LEDS
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(brightness);
@@ -87,6 +95,9 @@ void setup() {
   baseColor.g = preferences.getInt("baseColorG", 255);
   baseColor.b = preferences.getInt("baseColorB", 255);
   design = preferences.getString("design", "Solid");
+  if (design ==""){
+    design = "Solid";
+  }
   brightness = preferences.getInt("brightness", 32);
   FastLED.setBrightness(brightness);
   preferences.end();
@@ -100,8 +111,8 @@ void setup() {
     enableAP();
     for(int i=0;i<20;i++){
       fadeToBlackBy(leds,NUM_LEDS-8,80);
-    delay(50);
-  }
+      delay(50);
+    }
   }
   if(ssid != "" && password != ""){
     Serial.println("ssid: " + ssid + ", password: " + password);

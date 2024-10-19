@@ -13,7 +13,7 @@
 extern Preferences preferences;
 
 // WIFi
-extern bool APMode = false;
+extern bool APMode;
 extern String ssid;
 extern String password;
 extern DNSServer dnsServer;
@@ -37,8 +37,8 @@ extern RTC_DS3231 rtc;
 #define DATA_PIN    5
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
-#define NUM_LEDS 228
-#define num_leds_per_letter 2
+#define NUM_LEDS 114
+#define num_leds_per_letter 1
 extern CRGB leds[NUM_LEDS];
 extern bool updatedLEDs[NUM_LEDS];
 extern bool activeLEDs[NUM_LEDS];

@@ -15,8 +15,8 @@ extern const char index_html[] PROGMEM = R"rawliteral(
   <head>
       <title>Wortuhr Einstellungen</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+      <script src="js/jquery.min.js"></script>
+      <script src="js/iro.js"></script>
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
       <style>
         *{
