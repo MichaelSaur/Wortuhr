@@ -18,8 +18,6 @@
 Preferences preferences;
 // WiFi
 bool APMode = false;
-// const char* ssid     = "FRITZLE";
-// const char* password = "58241729953220762012";
 String ssid;
 String password;
 DNSServer dnsServer;
