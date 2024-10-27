@@ -5,6 +5,7 @@
 #include <AsyncElegantOTA.h>
 #include <DNSServer.h>
 #include <globals.h>
+#include "SPIFFS.h"
 
 #ifndef web_h
 #define web_h
@@ -222,6 +223,7 @@ extern const char index_html[] PROGMEM = R"rawliteral(
 
 void setupServer();
 String getIndexHTML();
+String templateProcessor(const String& var);
 
 class CaptiveRequestHandler : public AsyncWebHandler {
 public:
@@ -234,7 +236,7 @@ public:
   }
 
   void handleRequest(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", getIndexHTML().c_str()); 
+    request->send(SPIFFS,"/wortuhr.html","text/html",false,templateProcessor);
   }
 };
 

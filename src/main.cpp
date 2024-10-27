@@ -68,7 +68,7 @@ void setup() {
   Wire.begin();
   if(!rtc.begin()){
     Serial.println("Konnte RTC nicht finden!");
-    while (1);
+    RTCAvailable = false;
   }
   if(!SPIFFS.begin(true)){
     Serial.println("An Error has occurred while mounting SPIFFS");
@@ -120,7 +120,7 @@ void setup() {
 
   //preferences.putString("password", password);
     // Überprüfe, ob die RTC die aktuelle Zeit hat, andernfalls setze sie auf die Systemzeit
-  if (rtc.lostPower()) {
+  if (rtc.lostPower() && RTCAvailable) {
     DateTime now = rtc.now();
     Serial.println(now.timestamp(DateTime::TIMESTAMP_FULL));
     Serial.println("RTC hat die Zeit verloren! Setze die Zeit auf die Systemzeit.");
@@ -148,20 +148,6 @@ void loop() {
     if(hue == 255){
       hue = 0;
     }
-  }
-  EVERY_N_SECONDS(5){
-    DateTime now = rtc.now();
-    Serial.print(now.day());
-    Serial.print(".");
-    Serial.print(now.month());
-    Serial.print(".");
-    Serial.print(now.year());
-    Serial.print(" ");
-    Serial.print(now.hour());
-    Serial.print(":");
-    Serial.print(now.minute());
-    Serial.print(":");
-    Serial.println(now.second());
   }
 }
 

@@ -9,12 +9,29 @@
 #include "SPIFFS.h"
 
 String getIndexHTML();
+String templateProcessor(const String& var);
 
 void setupServer(){
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send_P(200, "text/html", getIndexHTML().c_str()); 
-        Serial.println("Client Connected");
+    server.serveStatic("/",SPIFFS,"/");
+    server.onNotFound([](AsyncWebServerRequest *request){
+        if (request->url() == "/"){
+            request->send(SPIFFS,"/wortuhr.html","text/html",false,templateProcessor);
+        }else{
+            request->send(404);
+        } 
     });
+
+    // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    //     //request->send(SPIFFS,);
+    //     String url = request->url();
+    //     if (url == "/"){
+    //         url = "/index.html";
+    //     }
+    //     Serial.println(url);
+    //     request->send(SPIFFS,url,String(),false,templateProcessor);
+    //     //request->send_P(200, "text/html", getIndexHTML().c_str()); 
+    //     //Serial.println("Client Connected");
+    // });
         
     server.on("/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
         String inputMessage;
@@ -78,7 +95,7 @@ void setupServer(){
             Serial.println(inputMessage);
             newColor.b = atoi(inputMessage.c_str());
         }
-         if (request->hasParam("brightness")) {
+        if (request->hasParam("brightness")) {
             inputMessage = request->getParam("brightness")->value();
             Serial.print("brightness: ");
             Serial.println(inputMessage);
@@ -99,12 +116,19 @@ void setupServer(){
         myTimeData.updateColor();
         request->redirect("/");
     });
-    // Route for root / web page
-    server.on("/js/jquery.min.js", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(SPIFFS, "/jquery.min.js", "application/javascript");
-    });
-    server.on("/js/iro.js", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(SPIFFS, "/iro.js", "application/javascript");
+    
+    server.on("/time",[] (AsyncWebServerRequest *request){
+        int timeUnix;
+        if (request->hasParam("timeUnix")) {
+            timeUnix = atoi(request->getParam("timeUnix")->value().c_str());
+            Serial.println(timeUnix);
+            DateTime dt = timeUnix;
+            if (RTCAvailable){
+                rtc.adjust(dt);
+            }
+            myTimeData.syncTime(); // force clock to syschronise from rtc if in AP mode
+        }
+        request->redirect("/");
     });
 }
 
@@ -126,4 +150,16 @@ String getIndexHTML(){
     html.replace("designValue",design);
     html.replace("brightnessValue",String(brightness));
     return html;
+}
+
+String templateProcessor(const String& var){
+    if(var == "ssidValue"){return ssid;}
+    if(var == "passwordValue"){return password;}
+    if(var == "colorRValue"){return String(baseColor.r);}
+    if(var == "colorGValue"){return String(baseColor.g);}
+    if(var == "colorBValue"){return String(baseColor.b);}
+    if(var == "designValue"){return design;}
+    if(var == "brightnessValue"){return String(brightness);}
+    Serial.println(var + " not found");
+    return "";
 }

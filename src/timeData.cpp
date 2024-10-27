@@ -100,23 +100,25 @@ void TimeData::animate(){
         bool activeSection = false;
         CRGB colors[NUM_LEDS];
         CRGB color;
-        int delta = 100;
+        int delta = 30;
         // generate new colors
         for(int i=0; i<NUM_LEDS; i++){
             if(updatedLEDs[i]){
                 numUpdates++;
                 if(activeLEDs[i] && !activeSection){
                     activeSection = true;
-                    int newR = baseColor.r+random(-delta,delta);
-                    if(newR<0){newR=-newR;}
-                    if(newR>255){newR=255-(newR-255);}
-                    int newG = baseColor.g+random(-delta,delta);
-                    if(newG<0){newG=-newG;}
-                    if(newG>255){newG=255-(newG-255);}
-                    int newB = baseColor.b+random(-delta,delta);
-                    if(newB<0){newB=-newB;}
-                    if(newB>255){newB=255-(newB-255);}
-                    color = CRGB(newR,newG,newB);
+                    CHSV basehue = rgb2hsv_approximate(baseColor);
+                    color = color.setHue(random(basehue.h-delta,basehue.h+delta));
+                    // int newR = baseColor.r+random(-delta,delta);
+                    // if(newR<0){newR=-newR;}
+                    // if(newR>255){newR=255-(newR-255);}
+                    // int newG = baseColor.g+random(-delta,delta);
+                    // if(newG<0){newG=-newG;}
+                    // if(newG>255){newG=255-(newG-255);}
+                    // int newB = baseColor.b+random(-delta,delta);
+                    // if(newB<0){newB=-newB;}
+                    // if(newB>255){newB=255-(newB-255);}
+                    // color = CRGB(newR,newG,newB);
                     Serial.print(baseColor.r);
                     Serial.print(" ");
                     Serial.print(baseColor.g);
@@ -562,6 +564,7 @@ void TimeData::syncTime(){
             hour = now.hour();
             minute = now.minute();
             second = now.second();
+            showTime = true;
         }
     }
 }
