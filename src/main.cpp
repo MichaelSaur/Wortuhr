@@ -210,7 +210,7 @@ void checkWiFi(){
 
 void animationLoading(){
   for(int i=0;i<11;i++){
-    fadeToBlackBy(leds,NUM_LEDS-8,80);
+    fadeToBlackBy(leds,NUM_LEDS-4*num_leds_per_letter,80);
     for(int j=0;j<NUM_LEDS-8;j++){
       if(j % 22 == i || j % 22 == 21-i){
         leds[j] = CRGB::Blue;
