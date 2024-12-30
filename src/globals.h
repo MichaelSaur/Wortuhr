@@ -14,6 +14,7 @@ extern Preferences preferences;
 
 // WIFi
 extern bool APMode;
+extern bool NightMode;
 extern String ssid;
 extern String password;
 extern DNSServer dnsServer;
@@ -42,7 +43,21 @@ extern RTC_DS3231 rtc;
 extern CRGB leds[NUM_LEDS];
 extern bool updatedLEDs[NUM_LEDS];
 extern bool activeLEDs[NUM_LEDS];
+extern uint8_t hue;
+
 extern uint8_t brightness;
 extern CRGB baseColor;
 extern String design; // Solid, Rainbow, Palette
-extern uint8_t hue;
+
+extern uint8_t brightnessDay;
+extern CRGB baseColorDay;
+extern String designDay; // Solid, Rainbow, Palette
+
+extern bool nightModeActive;
+extern uint8_t nightModeBeginHour;
+extern uint8_t nightModeBeginMinute;
+extern uint8_t nightModeEndHour;
+extern uint8_t nightModeEndMinute;
+extern uint8_t brightnessNight;
+extern CRGB baseColorNight;
+extern String designNight; // Solid, Rainbow, Palette

@@ -109,10 +109,125 @@ void setupServer(){
         preferences.putInt("baseColorB",newColor.b);
         preferences.putInt("brightness",newBrightness);
         preferences.end();
-        design = newDesign;
-        baseColor = newColor;
-        brightness = newBrightness;
-        FastLED.setBrightness(brightness);
+        designDay = newDesign;
+        baseColorDay = newColor;
+        brightnessDay = newBrightness;
+        if(!NightMode){
+            design = newDesign;
+            baseColor = newColor;
+            brightness = newBrightness;
+            FastLED.setBrightness(brightness);
+        }
+        myTimeData.updateColor();
+        request->redirect("/");
+    });
+
+    // night
+    server.on("/colorNight", HTTP_GET, [] (AsyncWebServerRequest *request) {
+        String inputMessage;
+        String newDesign;
+        CRGB newColor;
+        uint8_t newBrightness;
+        bool active = false;
+        uint8_t newBeginHour;
+        uint8_t newBeginMinute;
+        uint8_t newEndHour;
+        uint8_t newEndMinute;
+
+        if (request->hasParam("nightModeActiveInt")) {
+            inputMessage = request->getParam("nightModeActiveInt")->value();
+            Serial.print("active: ");
+            Serial.println(inputMessage);
+            int activeInt = atoi(inputMessage.c_str());
+            if(activeInt == 1){
+                active = true;
+            }else{
+                active = false;
+            }
+        }
+        if (request->hasParam("nightModeBeginHour")) {
+            inputMessage = request->getParam("nightModeBeginHour")->value();
+            Serial.print("BeginH: ");
+            Serial.println(inputMessage);
+            newBeginHour = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("nightModeBeginMinute")) {
+            inputMessage = request->getParam("nightModeBeginMinute")->value();
+            Serial.print("BeginM: ");
+            Serial.println(inputMessage);
+            newBeginMinute = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("nightModeEndHour")) {
+            inputMessage = request->getParam("nightModeEndHour")->value();
+            Serial.print("EndH: ");
+            Serial.println(inputMessage);
+            newEndHour = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("nightModeEndMinute")) {
+            inputMessage = request->getParam("nightModeEndMinute")->value();
+            Serial.print("EndM: ");
+            Serial.println(inputMessage);
+            newEndMinute = atoi(inputMessage.c_str());
+        }
+
+        if (request->hasParam("designNight")) {
+            inputMessage = request->getParam("designNight")->value();
+            newDesign = inputMessage;
+            Serial.println(inputMessage);
+        }
+
+        if (request->hasParam("colorNightR")) {
+            inputMessage = request->getParam("colorNightR")->value();
+            Serial.print("RNight: ");
+            Serial.println(inputMessage);
+            newColor.r = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("colorNightG")) {
+            inputMessage = request->getParam("colorNightG")->value();
+            Serial.print("GNight: ");
+            Serial.println(inputMessage);
+            newColor.g = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("colorNightB")) {
+            inputMessage = request->getParam("colorNightB")->value();
+            Serial.print("BNight: ");
+            Serial.println(inputMessage);
+            newColor.b = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("brightnessNight")) {
+            inputMessage = request->getParam("brightnessNight")->value();
+            Serial.print("brightnessNight: ");
+            Serial.println(inputMessage);
+            newBrightness = atoi(inputMessage.c_str());
+        }
+        
+        preferences.begin("wortuhr",false);
+        preferences.putInt("nightModeBeginH",newBeginHour);
+        nightModeBeginHour = newBeginHour;
+        preferences.putInt("nightModeBeginM",newBeginMinute);
+        nightModeBeginMinute = newBeginMinute;
+        preferences.putInt("nightModeEndH",newEndHour);
+        nightModeEndHour = newEndHour;
+        preferences.putInt("nightModeEndM",newEndMinute);
+        nightModeEndMinute = newEndMinute;
+
+        preferences.putBool("nightModeActive",active);
+        preferences.putString("designNight",newDesign);
+        preferences.putInt("baseColorNightR",newColor.r);
+        preferences.putInt("baseColorNightG",newColor.g);
+        preferences.putInt("baseColorNightB",newColor.b);
+        preferences.putInt("brightnessNight",newBrightness);
+        preferences.end();
+        nightModeActive = active;
+        designNight = newDesign;
+        baseColorNight = newColor;
+        brightnessNight = newBrightness;
+        if(NightMode){
+            design = newDesign;
+            baseColor = newColor;
+            brightness = newBrightness;
+            FastLED.setBrightness(brightness);
+        }
         myTimeData.updateColor();
         request->redirect("/");
     });
@@ -155,11 +270,36 @@ String getIndexHTML(){
 String templateProcessor(const String& var){
     if(var == "ssidValue"){return ssid;}
     if(var == "passwordValue"){return password;}
-    if(var == "colorRValue"){return String(baseColor.r);}
-    if(var == "colorGValue"){return String(baseColor.g);}
-    if(var == "colorBValue"){return String(baseColor.b);}
-    if(var == "designValue"){return design;}
-    if(var == "brightnessValue"){return String(brightness);}
+    // day
+    if(var == "colorRValue"){return String(baseColorDay.r);}
+    if(var == "colorGValue"){return String(baseColorDay.g);}
+    if(var == "colorBValue"){return String(baseColorDay.b);}
+    if(var == "designValue"){return designDay;}
+    if(var == "brightnessValue"){return String(brightnessDay);}
+    // night
+    if(var == "nightModeActive"){
+        if(nightModeActive){
+            return "true";
+        }else{
+            return "false";
+        }
+    }
+    if(var=="nightModeActiveInt"){
+        if(nightModeActive){
+            return "1";
+        }else{
+            return "0";
+        }
+    }
+    if(var == "nightModeBeginHourValue"){return String(nightModeBeginHour);}
+    if(var == "nightModeBeginMinuteValue"){return String(nightModeBeginMinute);}
+    if(var == "nightModeEndHourValue"){return String(nightModeEndHour);}
+    if(var == "nightModeEndMinuteValue"){return String(nightModeEndMinute);}
+    if(var == "colorNightRValue"){return String(baseColorNight.r);}
+    if(var == "colorNightGValue"){return String(baseColorNight.g);}
+    if(var == "colorNightBValue"){return String(baseColorNight.b);}
+    if(var == "designNightValue"){return designNight;}
+    if(var == "brightnessNightValue"){return String(brightnessNight);}
     Serial.println(var + " not found");
     return "";
 }

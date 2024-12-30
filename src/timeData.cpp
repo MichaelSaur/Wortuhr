@@ -49,6 +49,34 @@ void TimeData::init(){
     Serial.println(baseColor.b);
 }
 
+void TimeData::checkNightMode(){
+    int timeNowMinutes = hour*60+minute;
+    int nightModeBegin = nightModeBeginHour*60+nightModeBeginMinute;
+    int nightModeEnd = nightModeEndHour*60+nightModeEndMinute;
+    if (timeNowMinutes >= nightModeBegin || timeNowMinutes <= nightModeEnd){
+        setNightMode(true);
+    }else{
+        setNightMode(false);
+    }
+}
+
+void TimeData::setNightMode(bool state){
+    Serial.print("Setting night mode to ");
+    Serial.println(state);
+    NightMode = state;
+    if(!NightMode){
+        design = designDay;
+        baseColor = baseColorDay;
+        brightness = brightnessDay;
+        FastLED.setBrightness(brightness);
+    }else{
+        design = designNight;
+        baseColor = baseColorNight;
+        brightness = brightnessNight;
+        FastLED.setBrightness(brightness);
+    }
+}
+
 void TimeData::loop(){
     if(timesync){
         syncTime();
@@ -62,6 +90,7 @@ void TimeData::loop(){
         showMinute=false;
     }
     if(showTime){
+        checkNightMode();
         displayTime();
         printTime();
         //printActiveLEDs();

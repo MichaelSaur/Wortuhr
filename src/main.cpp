@@ -18,6 +18,7 @@
 Preferences preferences;
 // WiFi
 bool APMode = false;
+bool NightMode = false;
 String ssid;
 String password;
 DNSServer dnsServer;
@@ -42,15 +43,28 @@ RTC_DS3231 rtc;
 CRGB leds[NUM_LEDS];
 bool updatedLEDs[NUM_LEDS];
 bool activeLEDs[NUM_LEDS];
-uint8_t brightness = 32;
-CRGB baseColor;
-String design; // Solid, Rainbow, Palette, Random
 uint8_t hue = 0;
 
-// Web
+uint8_t brightness = 32;
+CRGB baseColor = CRGB::Blue;
+String design = "Solid"; // Solid, Rainbow, Palette, Random
 
+uint8_t brightnessDay = 32;
+CRGB baseColorDay;
+String designDay; // Solid, Rainbow, Palette, Random
+
+bool nightModeActive;
+uint8_t nightModeBeginHour;
+uint8_t nightModeBeginMinute;
+uint8_t nightModeEndHour;
+uint8_t nightModeEndMinute;
+
+uint8_t brightnessNight = 5;
+CRGB baseColorNight;
+String designNight; // Solid, Rainbow, Palette, Random
 
 // Functions
+void getPreferences();
 void connectWiFi(String ssid, String password);
 void enableAP();
 void checkWiFi();
@@ -79,26 +93,18 @@ void setup() {
   FastLED.setBrightness(brightness);
   
   animationLoading();
+  FastLED.clear();
+  FastLED.show();
 
   My_timer = timerBegin(0, 80, true);
   timerAttachInterrupt(My_timer, &onTimer, true);
   timerAlarmWrite(My_timer, 1000000, true);
   timerAlarmEnable(My_timer);
 
-  // get WiFi credentials from flash
-  preferences.begin("wortuhr",false);
-  ssid = preferences.getString("ssid", ""); 
-  password = preferences.getString("password", "");
-  baseColor.r = preferences.getInt("baseColorR", 255);
-  baseColor.g = preferences.getInt("baseColorG", 255);
-  baseColor.b = preferences.getInt("baseColorB", 255);
-  design = preferences.getString("design", "Solid");
-  if (design ==""){
-    design = "Solid";
-  }
-  brightness = preferences.getInt("brightness", 32);
+  // get WiFi credentials and colors, design,... from flash
+  getPreferences();
+
   FastLED.setBrightness(brightness);
-  preferences.end();
 
   myTimeData.init();
   setupServer();
@@ -135,6 +141,8 @@ void setup() {
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   server.begin();
   Serial.println("HTTP server started");
+  FastLED.clear();
+  FastLED.show();
 }
 
 void loop() {
@@ -149,6 +157,37 @@ void loop() {
       hue = 0;
     }
   }
+}
+
+void getPreferences(){
+  preferences.begin("wortuhr",false);
+  ssid = preferences.getString("ssid", ""); 
+  password = preferences.getString("password", "");
+  // day variables
+  baseColorDay.r = preferences.getInt("baseColorR", 255);
+  baseColorDay.g = preferences.getInt("baseColorG", 255);
+  baseColorDay.b = preferences.getInt("baseColorB", 255);
+  designDay = preferences.getString("design", "Solid");
+  if (designDay ==""){
+    designDay = "Solid";
+  }
+  brightnessDay = preferences.getInt("brightness", 32);
+  // night variables
+  nightModeActive = preferences.getBool("nightModeActive", false);
+  nightModeBeginHour = preferences.getInt("nightModeBeginH", 23);
+  nightModeBeginMinute = preferences.getInt("nightModeBeginM", 0);
+  nightModeEndHour = preferences.getInt("nightModeEndH", 8);
+  nightModeEndMinute = preferences.getInt("nightModeEndM", 0);
+  // TODO times
+  baseColorNight.r = preferences.getInt("baseColorNightR", 255);
+  baseColorNight.g = preferences.getInt("baseColorNightG", 255);
+  baseColorNight.b = preferences.getInt("baseColorNightB", 255);
+  designNight = preferences.getString("designNight", "Solid");
+  if (designNight ==""){
+    designNight = "Solid";
+  }
+  brightnessNight = preferences.getInt("brightnessNight", 5);
+  preferences.end();
 }
 
 void connectWiFi(String ssid, String password){
@@ -211,7 +250,7 @@ void checkWiFi(){
 void animationLoading(){
   for(int i=0;i<11;i++){
     fadeToBlackBy(leds,NUM_LEDS-4*num_leds_per_letter,80);
-    for(int j=0;j<NUM_LEDS-8;j++){
+    for(int j=0;j<NUM_LEDS-4*num_leds_per_letter;j++){
       if(j % 22 == i || j % 22 == 21-i){
         leds[j] = CRGB::Blue;
       }

@@ -23,6 +23,7 @@ class TimeData{
     void init();
     void displayNumber(int num);
     void animate();
+    void checkNightMode();
     
     private:
     bool timesync = true;
@@ -33,6 +34,7 @@ class TimeData{
     void printActiveLEDs();
     void setLED(int index, bool state);
     void displayDigit(uint8_t digit, uint8_t position);
+    void setNightMode(bool state);
 };
 
 #endif

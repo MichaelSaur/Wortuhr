@@ -53,6 +53,51 @@ form{
     grid-column: 1/3;
     text-align: center;
 }
+switch{
+    width: 2em;
+    height: 1em;
+    border-radius: 3em;
+    transition: background-color .25s;
+    position: relative;
+    z-index: 0;
+}
+switch[checked="false"],
+switch{
+    background-color: #aaaaaa;
+}
+switch[checked="loading"]{
+    background-color: var(--secondary);
+}
+switch[checked="true"]{
+    background-color: var(--dark-primary);
+}
+switch::after{
+    width: 1.25em;
+    height: 1.25em;
+    border-radius: 100%;
+    content: "";
+    display: block;
+    margin-top: -.125em;
+    transition: background-color .25s, filter .25s, margin-left .25s;
+    position: relative;
+    z-index: 1;
+}
+switch[checked="false"]::after,
+switch::after{
+    background-color: #cccccc;
+    filter: drop-shadow(0 1px 1px black);
+    margin-left: -.125em;
+}
+switch[checked="loading"]::after{
+    background-color: var(--dark-secondary);
+    filter: drop-shadow(0 1px 1px black);
+    margin-left: .375em;
+}
+switch[checked="true"]::after{
+    background-color: var(--primary);
+    filter: drop-shadow(0 1px 1px var(--dark-primary));
+    margin-left: 1.125em;
+}
 .slidercontainer{
     grid-column: 1/3;
     height: 2em;
@@ -98,6 +143,9 @@ form{
 .slidervalue{
     width: 2em;
     margin-left: .5em;
+}
+.OnNightModeActive.hidden{
+    display: none;
 }
 .toggle-password{
     cursor: pointer;
