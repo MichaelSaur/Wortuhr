@@ -4,5 +4,6 @@
         "string": "cpp",
         "random": "cpp",
         "limits": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "N:/Hobby/Microkontroller/Wortuhr/lib/AsyncTCP"
 }

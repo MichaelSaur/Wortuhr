@@ -50,6 +50,10 @@ void TimeData::init(){
 }
 
 void TimeData::checkNightMode(){
+    if(!nightModeActive){
+        setNightMode(false);
+        return;
+    }
     int timeNowMinutes = hour*60+minute;
     int nightModeBegin = nightModeBeginHour*60+nightModeBeginMinute;
     int nightModeEnd = nightModeEndHour*60+nightModeEndMinute;
