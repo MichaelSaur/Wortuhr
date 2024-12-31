@@ -3,7 +3,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
+#include <ElegantOTA.h>
 #include <DNSServer.h>
 #include <web.h>
 #include "time.h"
@@ -19,6 +19,7 @@ Preferences preferences;
 // WiFi
 bool APMode = false;
 bool NightMode = false;
+bool OTA = false;
 String ssid;
 String password;
 DNSServer dnsServer;
@@ -74,6 +75,22 @@ void initTime(String timezone);
 void printLocalTime();
 void IRAM_ATTR onTimer(){
   myTimeData.incTime();
+}
+void onOTAStart() {
+  // Log when OTA has started
+  Serial.println("OTA update started!");
+  OTA = true;
+  // <Add your own code here>
+}
+void onOTAEnd(bool success) {
+  // Log when OTA has finished
+  if (success) {
+    Serial.println("OTA update finished successfully!");
+  } else {
+    Serial.println("There was an error during OTA update!");
+  }
+  OTA = false;
+  // <Add your own code here>
 }
 
 void setup() {
@@ -138,7 +155,10 @@ void setup() {
   //   request->send(200, "text/plain", "Hi! I am ESP32.");
   // });
 
-  AsyncElegantOTA.begin(&server);    // Start ElegantOTA
+  ElegantOTA.begin(&server);    // Start ElegantOTA
+  ElegantOTA.onStart(onOTAStart);
+  //ElegantOTA.onProgress(onOTAProgress);
+  ElegantOTA.onEnd(onOTAEnd);
   server.begin();
   Serial.println("HTTP server started");
   FastLED.clear();
@@ -146,15 +166,18 @@ void setup() {
 }
 
 void loop() {
-  if (APMode){
-    dnsServer.processNextRequest();
-  }
-  myTimeData.loop();
-  delay(100);
-  EVERY_N_MILLISECONDS(500) {
-    hue++;
-    if(hue == 255){
-      hue = 0;
+  ElegantOTA.loop();
+  if(!OTA){
+    if (APMode){
+      dnsServer.processNextRequest();
+    }
+    myTimeData.loop();
+    delay(100);
+    EVERY_N_MILLISECONDS(500) {
+      hue++;
+      if(hue == 255){
+        hue = 0;
+      }
     }
   }
 }
@@ -178,7 +201,6 @@ void getPreferences(){
   nightModeBeginMinute = preferences.getInt("nightModeBeginM", 0);
   nightModeEndHour = preferences.getInt("nightModeEndH", 8);
   nightModeEndMinute = preferences.getInt("nightModeEndM", 0);
-  // TODO times
   baseColorNight.r = preferences.getInt("baseColorNightR", 255);
   baseColorNight.g = preferences.getInt("baseColorNightG", 255);
   baseColorNight.b = preferences.getInt("baseColorNightB", 255);

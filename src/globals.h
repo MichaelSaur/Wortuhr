@@ -5,7 +5,6 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
 #include <DNSServer.h>
 #include <Preferences.h>
 #include <RTClib.h>

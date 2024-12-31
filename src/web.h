@@ -2,7 +2,6 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
 #include <DNSServer.h>
 #include <globals.h>
 #include "SPIFFS.h"

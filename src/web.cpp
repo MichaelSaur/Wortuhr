@@ -2,7 +2,6 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
 #include <DNSServer.h>
 #include <globals.h>
 #include <timeData.h>
@@ -228,6 +227,7 @@ void setupServer(){
             brightness = newBrightness;
             FastLED.setBrightness(brightness);
         }
+        myTimeData.checkNightMode();
         myTimeData.updateColor();
         request->redirect("/");
     });

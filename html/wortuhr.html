@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+      <title>Wortuhr Einstellungen</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="/jquery.min.js"></script>
+      <script src="/iro.js"></script>
+      <script src="/index.js"></script>
+      <link rel="stylesheet" href="font-awesome.min.css">
+      <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+      <div class="header vc"><h1>Wortuhr Einstellungen</h1></div>
+      <br><br>
+      <!-- Time -->
+      <div class="hc"><div class="heading"><p >Zeit</p></div></div>
+      <div class="hc">
+        <form action="/time" id="timeForm">
+          <p>Time</p><p id="timeNow"></p>
+          <input id="timeUnix" name="timeUnix" type="number" value="" hidden />
+          <div class="separator"></div>
+          <div class="submit"><input type="submit" value="sync"></div>
+        </form>
+      </div>
+      <br>
+      <!-- Color -->
+      <div class="hc"><div class="heading"><p >Farbe</p></div></div>
+      <div class="hc">
+        <form action="/color">
+          <input id="designField" name="designField" type="text" value=%designValue% hidden />
+          <p>Design:</p><div class="hc"><select id="design" name="design">
+              <option value="Solid">Einfarbig</option>
+              <option value="Random">Zufall</option>
+              <option value="Rainbow">Regenbogen</option>
+              <option value="Palette">Palette</option>
+          </select></div>
+          <p>Farbe:</p><div class="hc" style="grid-column: 1/3;"><div id="picker"></div></div>
+          <input id="colorR" name="colorR" type="text" value=%colorRValue% hidden />
+          <input id="colorG" name="colorG" type="text" value=%colorGValue% hidden />
+          <input id="colorB" name="colorB" type="text" value=%colorBValue% hidden />
+          <nobr>Helligkeit:</nobr>
+          <div class="hl slidercontainer">
+            <input type="range" min="0" max="255" step="5" value=%brightnessValue% class="slider" name="brightness" id="brightness" /><div class="vc slidervalue"><nobr class="brightness">%brightnessValue%</nobr></div>
+          </div>
+          <div class="separator"></div>
+          <div class="submit"><input type="submit" value="speichern"></div>
+        </form>
+      </div>
+      <br>
+      <!-- Color Night-->
+      <div class="hc"><div class="heading"><p >Nachtmodus</p></div></div>
+      <div class="hc">
+        <form action="/colorNight">
+          <p>Aktiv</p><switch id="nightModeActive" checked=%nightModeActive% ></switch><input type="number" name="nightModeActiveInt" id="nightModeActiveInt" value=%nightModeActiveInt% hidden/>
+          <p class="OnNightModeActive">Von</p><div class="OnNightModeActive">
+            <input id="nightModeBeginHourField" name="nightModeBeginHourField" type="number" value=%nightModeBeginHourValue% hidden />
+            <select id="nightModeBeginHour" name="nightModeBeginHour">
+              <option>16</option>
+              <option>17</option>
+              <option>18</option>
+              <option>19</option>
+              <option>20</option>
+              <option>21</option>
+              <option>22</option>
+              <option>23</option>
+              <option>0</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+              <option>10</option>
+              <option>11</option>
+              <option>12</option>
+              <option>13</option>
+              <option>14</option>
+              <option>15</option>
+            </select>
+            :
+            <input id="nightModeBeginMinuteField" name="nightModeBeginMinuteField" type="number" value=%nightModeBeginMinuteValue% hidden />
+            <select id="nightModeBeginMinute" name="nightModeBeginMinute">
+              <option>0</option>
+              <option>15</option>
+              <option>30</option>
+              <option>45</option>
+            </select>
+            Uhr
+          </div>
+          <p class="OnNightModeActive">Bis</p><div class="OnNightModeActive">
+            <input id="nightModeEndHourField" name="nightModeEndHourField" type="number" value=%nightModeEndHourValue% hidden />
+            <select id="nightModeEndHour" name="nightModeEndHour">
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+              <option>10</option>
+              <option>11</option>
+              <option>12</option>
+              <option>13</option>
+              <option>14</option>
+              <option>15</option>
+              <option>16</option>
+              <option>17</option>
+              <option>18</option>
+              <option>19</option>
+              <option>20</option>
+              <option>21</option>
+              <option>22</option>
+              <option>23</option>
+              <option>0</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+            </select>
+            :
+            <input id="nightModeEndMinuteField" name="nightModeEndMinuteField" type="number" value=%nightModeEndMinuteValue% hidden />
+            <select id="nightModeEndMinute" name="nightModeEndMinute">
+              <option>0</option>
+              <option>15</option>
+              <option>30</option>
+              <option>45</option>
+            </select>
+            Uhr
+          </div>
+          <input class="OnNightModeActive" id="designNightField" name="designNightField" type="text" value=%designNightValue% hidden />
+          <p class="OnNightModeActive">Design:</p><div class="hc OnNightModeActive"><select id="designNight" name="designNight">
+              <option value="Solid">Einfarbig</option>
+              <option value="Random">Zufall</option>
+              <option value="Rainbow">Regenbogen</option>
+              <option value="Palette">Palette</option>
+          </select></div>
+          <p class="OnNightModeActive">Farbe:</p><div class="hc OnNightModeActive" style="grid-column: 1/3;"><div id="pickerNight"></div></div>
+          <input class="OnNightModeActive" id="colorNightR" name="colorNightR" type="text" value=%colorNightRValue% hidden />
+          <input class="OnNightModeActive" id="colorNightG" name="colorNightG" type="text" value=%colorNightGValue% hidden />
+          <input class="OnNightModeActive" id="colorNightB" name="colorNightB" type="text" value=%colorNightBValue% hidden />
+          <nobr class="OnNightModeActive">Helligkeit:</nobr>
+          <div class="hl slidercontainer OnNightModeActive">
+            <input type="range" min="0" max="255" step="5" value=%brightnessNightValue% class="slider" name="brightnessNight" id="brightnessNight" /><div class="vc slidervalue"><nobr class="brightnessNight">%brightnessNightValue%</nobr></div>
+          </div>
+          <div class="separator"></div>
+          <div class="submit"><input type="submit" value="speichern"></div>
+        </form>
+      </div>
+      <br>
+      <!-- Network -->
+      <div class="hc"><div class="heading"><p >WiFi</p></div></div>
+      <div class="hc">
+        <form action="/config">
+          <p>SSID:</p><div class="hl"><input type="text" name="ssid" value=%ssidValue% /></div>
+          <p>Password:</p><div class="hl"><input type="password" name="password" value=%passwordValue% id="password" /><div class="vc"><span toggle="#password" class="fa fa-fw fa-eye toggle-password"></span></div></div>
+          <div class="separator"></div>
+          <div class="submit" ><input type="submit" value="speichern"></div>
+        </form>
+      </div>
+      <br>
+      <div class="hc">
+        <a href="/update">Software update</a>
+      </div>
+    </body>
+</html>
