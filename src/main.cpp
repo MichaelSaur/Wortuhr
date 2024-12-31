@@ -24,6 +24,9 @@ String ssid;
 String password;
 DNSServer dnsServer;
 AsyncWebServer server(80);
+TaskHandle_t Task1;
+bool scanComplete = false;
+String KnownSSIDs[10];
 
 // Time
 const char* ntpServer = "pool.ntp.org";
@@ -67,6 +70,7 @@ String designNight; // Solid, Rainbow, Palette, Random
 // Functions
 void getPreferences();
 void connectWiFi(String ssid, String password);
+void scanNetworks();
 void enableAP();
 void checkWiFi();
 void animationLoading();
@@ -166,12 +170,16 @@ void setup() {
 }
 
 void loop() {
-  ElegantOTA.loop();
-  if(!OTA){
-    if (APMode){
-      dnsServer.processNextRequest();
-    }
+  if(!OTA){ 
     myTimeData.loop();
+    if(scanComplete){
+      ElegantOTA.loop();
+      if (APMode){
+        dnsServer.processNextRequest();
+      }
+    }else{
+      scanNetworks();
+    }
     delay(100);
     EVERY_N_MILLISECONDS(500) {
       hue++;
@@ -343,4 +351,26 @@ void printLocalTime(){
     return;
   }
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S zone %Z %z ");
+}
+
+void scanNetworks(){
+  int n = WiFi.scanNetworks();
+    if (n == 0) {
+      Serial.println("no networks found");
+  } else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    if (n>10){
+      n=10;
+    }
+    for (int i = 0; i < n; i++) {
+      // Print SSID and RSSI for each network found
+      KnownSSIDs[i] = WiFi.SSID(i);
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.println(KnownSSIDs[i]);
+      delay(10);
+    }
+  }
+  scanComplete = true;
 }

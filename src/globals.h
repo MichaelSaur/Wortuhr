@@ -18,8 +18,7 @@ extern String ssid;
 extern String password;
 extern DNSServer dnsServer;
 extern AsyncWebServer server;
-extern const char index_html[] PROGMEM;
-extern const char config_html[] PROGMEM;
+extern String KnownSSIDs[10];
 
 // Time
 extern const char* ntpServer;

@@ -6,6 +6,9 @@ $(document).ready(function () {
     changeValue(event.target)
   })
 
+  var selectedSSID = $('#ssidField').val()
+  $('#ssid').val(selectedSSID)
+
   // daymode
   colorR = $('#colorR').val()
   colorG = $('#colorG').val()

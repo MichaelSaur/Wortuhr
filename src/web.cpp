@@ -247,28 +247,17 @@ void setupServer(){
     });
 }
 
-String getConfigHTML(){
-    String html = String(config_html);
-    html.replace("ssidValue",ssid);
-    html.replace("passwordValue",password);
-    //html.replace("pcolorValue",color);
-    return html;
-}
-
-String getIndexHTML(){
-    String html = String(index_html);
-    html.replace("ssidValue",ssid);
-    html.replace("passwordValue",password);
-    html.replace("colorRValue",String(baseColor.r));
-    html.replace("colorGValue",String(baseColor.g));
-    html.replace("colorBValue",String(baseColor.b));
-    html.replace("designValue",design);
-    html.replace("brightnessValue",String(brightness));
-    return html;
-}
-
 String templateProcessor(const String& var){
     if(var == "ssidValue"){return ssid;}
+    if (var == "knownSSIDs"){
+        String ret = "";
+        for(int i=0;i<10;i++){
+            if (KnownSSIDs[i] != ""){
+                ret += "<option>" + KnownSSIDs[i] + "</option>";
+            }
+        }
+        return ret;
+    }
     if(var == "passwordValue"){return password;}
     // day
     if(var == "colorRValue"){return String(baseColorDay.r);}

@@ -152,7 +152,11 @@
       <div class="hc"><div class="heading"><p >WiFi</p></div></div>
       <div class="hc">
         <form action="/config">
-          <p>SSID:</p><div class="hl"><input type="text" name="ssid" value=%ssidValue% /></div>
+          <!--p>SSID:</p><div class="hl"><input type="text" name="ssid" value=%ssidValue% /></div-->
+          <p>SSID:</p><input id="ssidField" name="ssidField" type="text" value=%ssidValue% hidden />
+          <select id="ssid" name="ssid">
+            %knownSSIDs%
+          </select>
           <p>Password:</p><div class="hl"><input type="password" name="password" value=%passwordValue% id="password" /><div class="vc"><span toggle="#password" class="fa fa-fw fa-eye toggle-password"></span></div></div>
           <div class="separator"></div>
           <div class="submit" ><input type="submit" value="speichern"></div>
