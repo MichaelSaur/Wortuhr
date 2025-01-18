@@ -15,15 +15,12 @@ String templateProcessor(const String& var);
 
 class CaptiveRequestHandler : public AsyncWebHandler {
 public:
-  CaptiveRequestHandler() {}
-  virtual ~CaptiveRequestHandler() {}
-
-  bool canHandle(AsyncWebServerRequest *request){
-    //request->addInterestingHeader("ANY");
-    return true;
-  }
+  bool canHandle(__unused AsyncWebServerRequest* request) const override {
+      return true;
+    }
 
   void handleRequest(AsyncWebServerRequest *request) {
+    Serial.println("Captive handler");
     request->send(SPIFFS,"/wortuhr.html","text/html",false,templateProcessor);
   }
 };

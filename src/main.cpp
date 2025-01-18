@@ -257,13 +257,14 @@ void connectWiFi(String ssid, String password){
 void enableAP(){
   APMode = true;
   WiFi.setHostname("Wortuhr");
+  WiFi.mode(WIFI_AP); 
   WiFi.softAP("Wortuhr", NULL);
   Serial.println("Creating access point..");
   // while (WiFi.status() != WL_IDLE_STATUS) {
   //   animationLoading();
   //   Serial.println("Creating access point..");
   // }
-  Serial.println(WiFi.localIP());
+  Serial.println(WiFi.softAPIP());
   dnsServer.start(53, "*", WiFi.softAPIP());
   server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);//only when requested from AP
 }

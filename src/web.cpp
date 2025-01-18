@@ -250,7 +250,7 @@ void setupServer(){
 String templateProcessor(const String& var){
     if(var == "ssidValue"){return ssid;}
     if (var == "knownSSIDs"){
-        String ret = "";
+        String ret = "<option></option>";
         for(int i=0;i<10;i++){
             if (KnownSSIDs[i] != ""){
                 ret += "<option>" + KnownSSIDs[i] + "</option>";
