@@ -258,7 +258,7 @@ void enableAP(){
   APMode = true;
   WiFi.setHostname("Wortuhr");
   WiFi.mode(WIFI_AP); 
-  WiFi.softAP("Wortuhr", NULL);
+  WiFi.softAP("Wortuhr", "FünfVorZwölf");
   Serial.println("Creating access point..");
   // while (WiFi.status() != WL_IDLE_STATUS) {
   //   animationLoading();
