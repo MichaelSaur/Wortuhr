@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Wortuhr Einstellungen</title>
+<script src="jquery.min.js"></script>
+<!-- Tailwind + DaisyUI -->
+<!--link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" /-->
+<link rel="stylesheet" href="full.min.css"/>
+<!--script src="https://cdn.tailwindcss.com"></script-->
+<script src="tailwindcss-3.4.17.js"></script>
+<!-- iro.js -->
+<!--script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script-->
+<script src="iro.js"></script>
+
+</head>
+<body class="bg-base-300 dark:bg-gray-600 p-6">
+
+<h1 class="text-3xl font-bold text-center dark:text-white mb-8">Wortuhr Einstellungen</h1>
+
+<div class="max-w-4xl mx-auto grid gap-6">
+
+    <!-- Zeit -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Zeit</h2>
+
+            <div class="mt-4">
+                <label class="label"><span class="label-text">Aktuelle Systemzeit</span></label>
+                <div id="systemTime" class="text-xl font-semibold"></div>
+            </div>
+
+            <div class="card-actions justify-end mt-4">
+                <button class="btn btn-primary" onclick="syncTime()">Mit Gerätezeit synchronisieren</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farben -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Farben</h2>
+
+            <div class="mt-4">
+                <label class="label"><span class="label-text">Primärfarbe</span></label>
+                <div class="mt-4 flex justify-center">
+                    <div id="colorPicker"></div>
+                </div>
+            </div>
+
+            <div class="form-control mt-4">
+                <label class="label"><span class="label-text">Modus</span></label>
+                <select class="select select-bordered dark:bg-gray-400 dark:text-white" id="colorMode">
+                </select>
+            </div>
+
+            <div class="form-control mt-4">
+                <label class="label"><span class="label-text">Helligkeit</span></label>
+                <div class="flex items-center gap-4">
+                    <input type="range" min="0" max="255" value="180" class="range" id="brightness">
+                    <span id="brightnessValue" class="w-10 text-right font-semibold">180</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nachtmodus -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Nachtmodus</h2>
+
+            <div class="form-control mt-4">
+                <label class="cursor-pointer label">
+                    <span class="label-text">Nachtmodus aktivieren</span>
+                    <input type="checkbox" class="toggle toggle-primary" id="nightModeToggle">
+                </label>
+            </div>
+
+            <div id="nightSettings" class="opacity-50 pointer-events-none">
+
+                <!-- Startzeit -->
+                <div class="form-control mt-4">
+                    <label class="label"><span class="label-text">Startzeit</span></label>
+                    <input type="time" id="nightStart" class="input input-bordered dark:bg-gray-400 dark:text-white w-40">
+                </div>
+
+                <!-- Endzeit -->
+                <div class="form-control mt-4">
+                    <label class="label"><span class="label-text">Endzeit</span></label>
+                    <input type="time" id="nightEnd" class="input input-bordered dark:bg-gray-400 dark:text-white w-40">
+                </div>
+
+                <!-- Color Picker -->
+                <div class="mt-6 flex justify-center">
+                    <div id="nightColorPicker"></div>
+                </div>
+
+                <!-- Modus -->
+                <div class="form-control mt-6">
+                    <label class="label"><span class="label-text">Modus</span></label>
+                    <select class="select select-bordered dark:bg-gray-400 dark:text-white" id="nightMode">
+                    </select>
+                </div>
+
+                <!-- Helligkeit -->
+                <div class="form-control mt-4">
+                    <label class="label"><span class="label-text">Helligkeit</span></label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" min="0" max="255" value="80" class="range" id="nightBrightness">
+                        <span id="nightBrightnessValue" class="w-10 text-right font-semibold">80</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- WiFi -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">WiFi</h2>
+
+            <div class="form-control mt-4">
+                <label class="label"><span class="label-text">SSID auswählen</span></label>
+                <select class="select select-bordered dark:bg-gray-400 dark:text-white" id="wifiSSID">
+                </select>
+            </div>
+
+            <div class="form-control mt-4">
+                <label class="label"><span class="label-text">Passwort</span></label>
+
+                <div class="relative">
+                    <input type="password" 
+                        class="input input-bordered w-full pr-12" 
+                        id="wifiPassword" 
+                        placeholder="Passwort eingeben">
+
+                    <button type="button"
+                            id="togglePassword"
+                            class="btn btn-sm btn-ghost absolute right-1 top-1/2 -translate-y-1/2">
+                        👁️
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Uhrzeit aktualisieren
+    var clockTime = 0;
+    function updateTime() {
+        if(clockTime == 0){
+            document.getElementById("systemTime").textContent = "loading..."
+        }else{
+            clockTime = clockTime+1000;
+        const now = new Date(clockTime);
+        document.getElementById("systemTime").textContent =
+            now.toLocaleTimeString("de-DE");
+        }
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    function syncTime() {
+        alert("Zeit wurde mit dem Endgerät synchronisiert.");
+    }
+
+    // Nachtmodus aktivieren/deaktivieren
+    const nightModeToggle = document.getElementById("nightModeToggle");
+    nightModeToggle.addEventListener("change", function() {
+        const block = document.getElementById("nightSettings");
+        if (this.checked) {
+            block.classList.remove("opacity-50", "pointer-events-none");
+        } else {
+            block.classList.add("opacity-50", "pointer-events-none");
+        }
+    });
+
+    // Haupt-Helligkeit
+    const brightnessSlider = document.getElementById("brightness");
+    const brightnessValue = document.getElementById("brightnessValue");
+    // Nacht-Helligkeit
+    const nightBrightnessSlider = document.getElementById("nightBrightness");
+    const nightBrightnessValue = document.getElementById("nightBrightnessValue");
+
+    $("document").ready(()=>{
+        $.get("api/config",function(data, status){
+            if(status=="success"){
+                data = JSON.parse(data);
+                console.log(data)
+                clockTime = data.time*1000
+                
+                // iro.js Color Picker – Hauptfarbe
+                colorString = 'rgb(' + data.baseColor.r + ',' + data.baseColor.g + ',' + data.baseColor.b + ')'
+                const colorPicker = new iro.ColorPicker("#colorPicker", {
+                    width: 250,
+                    color: colorString,
+                    layout: [
+                        { component: iro.ui.Wheel },
+                        { component: iro.ui.Slider, options: { sliderType: "value" } }
+                    ]
+                });
+                colorPicker.on("color:change", function(color) {
+                    console.log("Primärfarbe:", color.hexString);
+                });
+
+                // Mode
+                var modes = []
+                data.modes.forEach(element => {
+                    if(element == data.baseColor.mode){
+                        modes.push("<option selected>"+element+"</option>");
+                    }else{
+                        modes.push("<option>"+element+"</option>");
+                    }
+                });
+                document.getElementById("colorMode").innerHTML = modes;
+
+                brightnessSlider.value = data.baseColor.brightness;
+                brightnessValue.textContent = data.baseColor.brightness;
+
+                ///////
+                // Nightmode
+                ///////
+                nightModeToggle.checked = data.nightMode.enabled;
+                nightModeToggle.dispatchEvent(new CustomEvent("change"));
+
+                document.getElementById("nightStart").value = data.nightMode.startH.toString().padStart(2, "0") + ":" + data.nightMode.startM.toString().padStart(2, "0");
+                document.getElementById("nightEnd").value = data.nightMode.endH.toString().padStart(2, "0") + ":" + data.nightMode.endM.toString().padStart(2, "0");
+
+                colorString = 'rgb(' + data.nightMode.baseColor.r + ',' + data.nightMode.baseColor.g + ',' + data.nightMode.baseColor.b + ')'
+                const nightColorPicker = new iro.ColorPicker("#nightColorPicker", {
+                    width: 250,
+                    color: colorString,
+                    layout: [
+                        { component: iro.ui.Wheel },
+                        { component: iro.ui.Slider, options: { sliderType: "value" } }
+                    ]
+                });
+                nightColorPicker.on("color:change", function(color) {
+                    console.log("Nachtfarbe:", color.hexString);
+                });
+
+                // Mode
+                var modes = []
+                data.modes.forEach(element => {
+                    if(element == data.nightMode.baseColor.mode){
+                        modes.push("<option selected>"+element+"</option>");
+                    }else{
+                        modes.push("<option>"+element+"</option>");
+                    }
+                });
+                document.getElementById("nightMode").innerHTML = modes;
+
+                nightBrightnessSlider.value =data.nightMode.baseColor.brightness;
+                nightBrightnessValue.textContent = data.nightMode.baseColor.brightness;
+
+                // WiFi
+                var ssids = []
+                data.wiFiSSIDs.forEach(element => {
+                    if(element == data.WiFi){
+                        ssids.push("<option selected>"+element+"</option>");
+                    }else{
+                        ssids.push("<option>"+element+"</option>");
+                    }
+                });
+                document.getElementById("wifiSSID").innerHTML = ssids;
+                document.getElementById("wifiPassword").value = data.password;
+            }
+        });
+    })
+
+    // Passwort anzeigen/verbergen
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const input = document.getElementById("wifiPassword");
+
+        if (input.type === "password") {
+            input.type = "text";
+            this.textContent = "🙈";
+        } else {
+            input.type = "password";
+            this.textContent = "👁️";
+        }
+    });
+
+    brightnessSlider.addEventListener("input", () => {
+        brightnessValue.textContent = brightnessSlider.value;
+    });
+
+    nightBrightnessSlider.addEventListener("input", () => {
+        nightBrightnessValue.textContent = nightBrightnessSlider.value;
+    });
+</script>
+
+</body>
+</html>
