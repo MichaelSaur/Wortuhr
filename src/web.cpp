@@ -31,7 +31,15 @@ void setupServer(){
     //     //request->send_P(200, "text/html", getIndexHTML().c_str()); 
     //     //Serial.println("Client Connected");
     // });
-        
+    server.on("/api/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
+        preferences.begin("wortuhr",false);
+        ssid = preferences.getString("ssid", ""); 
+        password = preferences.getString("password", "");
+        preferences.end();
+        String config = "{\"time\":1767821325,\"baseColor\":{\"r\":128,\"g\":255,\"b\":56,\"mode\":\"Random\",\"brightness\":120},\"nightMode\":{\"enabled\":true,\"startH\":22,\"startM\":15,\"endH\":7,\"endM\":34,\"baseColor\":{\"r\":255,\"g\":128,\"b\":56,\"mode\":\"Pallet\",\"brightness\":60}},\"WiFi\":\"" + ssid + "\",\"password\":\"" + password + "\",\"modes\":[\"Static\",\"Pallet\",\"Random\",\"Rainbow\"],\"wiFiSSIDs\":[\"FritzBox7490\",\"FRITZLE\",\"Gastzugang Bissingerstraße\"]}";
+        request->send_P(200, "application/json", config.c_str()); 
+    });
+
     server.on("/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
         String inputMessage;
         String inputParam;
