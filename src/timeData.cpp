@@ -134,13 +134,13 @@ void TimeData::animate(){
         CRGB colors[NUM_LEDS];
         CRGB color;
         int delta = 30;
+        CHSV basehue = rgb2hsv_approximate(baseColor);
         // generate new colors
         for(int i=0; i<NUM_LEDS; i++){
             if(updatedLEDs[i]){
                 numUpdates++;
                 if(activeLEDs[i] && !activeSection){
                     activeSection = true;
-                    CHSV basehue = rgb2hsv_approximate(baseColor);
                     color = color.setHue(random(basehue.h-delta,basehue.h+delta));
                     // int newR = baseColor.r+random(-delta,delta);
                     // if(newR<0){newR=-newR;}

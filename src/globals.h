@@ -14,11 +14,14 @@ extern Preferences preferences;
 // WIFi
 extern bool APMode;
 extern bool NightMode;
+extern bool previewColorFullScreen;
+extern unsigned long previewColorTriggerTimestamp;
 extern String ssid;
 extern String password;
 extern DNSServer dnsServer;
 extern AsyncWebServer server;
 extern String KnownSSIDs[10];
+extern String KnownSSIDsList;
 
 // Time
 extern const char* ntpServer;
@@ -46,6 +49,7 @@ extern uint8_t hue;
 extern uint8_t brightness;
 extern CRGB baseColor;
 extern String design; // Solid, Rainbow, Palette
+extern String designOptions;
 
 extern uint8_t brightnessDay;
 extern CRGB baseColorDay;

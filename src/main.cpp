@@ -20,6 +20,8 @@ Preferences preferences;
 bool APMode = false;
 bool NightMode = false;
 bool OTA = false;
+bool previewColorFullScreen = false;
+unsigned long previewColorTriggerTimestamp = 0;
 String ssid;
 String password;
 DNSServer dnsServer;
@@ -27,6 +29,7 @@ AsyncWebServer server(80);
 TaskHandle_t Task1;
 bool scanComplete = false;
 String KnownSSIDs[10];
+String KnownSSIDsList = "";
 
 // Time
 const char* ntpServer = "pool.ntp.org";
@@ -48,10 +51,12 @@ CRGB leds[NUM_LEDS];
 bool updatedLEDs[NUM_LEDS];
 bool activeLEDs[NUM_LEDS];
 uint8_t hue = 0;
+uint8_t deltaHueAllLEDs = 255/NUM_LEDS;
 
 uint8_t brightness = 32;
 CRGB baseColor = CRGB::Blue;
 String design = "Solid"; // Solid, Rainbow, Palette, Random
+String designOptions = "\"Solid\",\"Rainbow\",\"Palette\",\"Random\"";
 
 uint8_t brightnessDay = 32;
 CRGB baseColorDay;
@@ -171,7 +176,92 @@ void setup() {
 
 void loop() {
   if(!OTA){ 
-    myTimeData.loop();
+    if(!previewColorFullScreen){
+      myTimeData.loop();
+    }else{
+      if(design == "Solid"){
+        fill_solid(leds,NUM_LEDS,baseColor);
+      }
+      if(design == "Palette"){
+        // fill_solid(leds,NUM_LEDS,baseColor);
+        int delta = 30;
+        int delta4 = delta/4;
+        CRGB color;
+        CHSV basehue = rgb2hsv_approximate(baseColor);
+
+        // color = color.setHue(basehue.h-delta);
+        // fill_solid(leds,11,color);
+
+        // color = color.setHue(basehue.h-3*delta4);
+        // fill_solid(leds+11,11,color);
+
+        // color = color.setHue(basehue.h-2*delta4);
+        // fill_solid(leds+22,11,color);
+
+        // color = color.setHue(basehue.h-delta4);
+        // fill_solid(leds+33,11,color);
+
+        // fill_solid(leds+44,11,baseColor);
+        // fill_solid(leds+55,11,baseColor);
+
+        // color = color.setHue(basehue.h+delta4);
+        // fill_solid(leds+66,11,color);
+
+        // color = color.setHue(basehue.h+2*delta4);
+        // fill_solid(leds+77,11,color);
+
+        // color = color.setHue(basehue.h+3*delta4);
+        // fill_solid(leds+88,11,color);
+
+        // color = color.setHue(basehue.h+delta);
+        // fill_solid(leds+99,11,color);
+
+        color = color.setHue(basehue.h-delta);
+        leds[NUM_LEDS-4] = color;
+        leds[NUM_LEDS-3] = color;
+        fill_solid(leds,11,color);
+        fill_solid(leds+11,11,color);
+
+        fill_solid(leds+22,11,CRGB::Black);
+        fill_solid(leds+33,11,CRGB::Black);
+
+        fill_solid(leds+44,11,baseColor);
+        fill_solid(leds+55,11,baseColor);
+
+        fill_solid(leds+66,11,CRGB::Black);
+        fill_solid(leds+77,11,CRGB::Black);
+
+        color = color.setHue(basehue.h+delta);
+        fill_solid(leds+88,11,color);
+        fill_solid(leds+99,11,color);
+        leds[NUM_LEDS-2] = color;
+        leds[NUM_LEDS-1] = color;
+      }
+      if(design == "Random"){
+        fill_solid(leds,NUM_LEDS,baseColor);
+      }
+      if(design == "Rainbow"){
+        fill_rainbow(leds,NUM_LEDS,hue,deltaHueAllLEDs);
+      }
+      FastLED.setBrightness(brightness);
+      FastLED.show();
+      if(millis() - previewColorTriggerTimestamp > 5000){
+        previewColorFullScreen = false;
+        if(!NightMode){
+          baseColor = baseColorDay;
+          brightness = brightnessDay;
+          design = designDay;
+        }else{
+          baseColor = baseColorNight;
+          brightness = brightnessNight;
+          design = designNight;
+        }
+        FastLED.setBrightness(brightness);
+        FastLED.clear();
+        FastLED.show();
+        myTimeData.updateColor();
+      }
+    }
     if(scanComplete){
       ElegantOTA.loop();
       if (APMode){
@@ -372,6 +462,17 @@ void scanNetworks(){
       Serial.println(KnownSSIDs[i]);
       delay(10);
     }
+
+    KnownSSIDsList = "";
+    for(int i=0;i<10;i++){
+        if (KnownSSIDs[i] != ""){
+            if(i>0){
+                KnownSSIDsList += ",";
+            }
+            KnownSSIDsList += "\""+KnownSSIDs[i]+"\"";
+        }
+    }
+
   }
   scanComplete = true;
 }

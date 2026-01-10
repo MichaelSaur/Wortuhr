@@ -32,12 +32,64 @@ void setupServer(){
     //     //Serial.println("Client Connected");
     // });
     server.on("/api/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
-        preferences.begin("wortuhr",false);
-        ssid = preferences.getString("ssid", ""); 
-        password = preferences.getString("password", "");
-        preferences.end();
-        String config = "{\"time\":1767821325,\"baseColor\":{\"r\":128,\"g\":255,\"b\":56,\"mode\":\"Random\",\"brightness\":120},\"nightMode\":{\"enabled\":true,\"startH\":22,\"startM\":15,\"endH\":7,\"endM\":34,\"baseColor\":{\"r\":255,\"g\":128,\"b\":56,\"mode\":\"Pallet\",\"brightness\":60}},\"WiFi\":\"" + ssid + "\",\"password\":\"" + password + "\",\"modes\":[\"Static\",\"Pallet\",\"Random\",\"Rainbow\"],\"wiFiSSIDs\":[\"FritzBox7490\",\"FRITZLE\",\"Gastzugang Bissingerstraße\"]}";
+        String config = "{";
+        config += "\"time\":"+ String(myTimeData.hour*60+ myTimeData.minute*60+myTimeData.second) + ",";
+        config += "\"baseColor\":{\"r\":" + String(baseColorDay.r) + ",\"g\":" + String(baseColorDay.g) + ",\"b\":" + String(baseColorDay.b) + ",\"mode\":\"" + designDay + "\",\"brightness\":" + String(brightnessDay) + "},";
+        if(NightMode){
+            config += "\"nightMode\":{\"enabled\":true,";
+        }else{
+            config += "\"nightMode\":{\"enabled\":false,";
+        }
+        config += "\"startH\":" + String(nightModeBeginHour) + ",\"startM\":" + String(nightModeBeginMinute) + ",\"endH\":" + String(nightModeEndHour) + ",\"endM\":" + String(nightModeEndMinute) + ",";
+        config += "\"baseColor\":{\"r\":" + String(baseColorNight.r) + ",\"g\":" + String(baseColorNight.g) + ",\"b\":" + String(baseColorNight.b) + ",\"mode\":\"" + designNight + "\",\"brightness\":" + String(brightnessNight) + "}},";        
+        config += "\"WiFi\":\"" + ssid + "\",\"password\":\"" + password + "\",\"modes\":[" + designOptions + "],\"wiFiSSIDs\":[" + KnownSSIDsList + "]}";
         request->send_P(200, "application/json", config.c_str()); 
+    });
+
+    server.on("/api/previewColor",HTTP_GET, [] (AsyncWebServerRequest * request){
+        previewColorFullScreen = true;
+        previewColorTriggerTimestamp = millis();
+
+        String inputMessage;
+        String newDesign;
+        CRGB newColor;
+        uint8_t newBrightness;
+
+        if (request->hasParam("d")) {
+            inputMessage = request->getParam("d")->value();
+            newDesign = inputMessage;
+            Serial.println(inputMessage);
+        }
+        if (request->hasParam("r")) {
+            inputMessage = request->getParam("r")->value();
+            Serial.print("R: ");
+            Serial.println(inputMessage);
+            newColor.r = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("g")) {
+            inputMessage = request->getParam("g")->value();
+            Serial.print("G: ");
+            Serial.println(inputMessage);
+            newColor.g = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("b")) {
+            inputMessage = request->getParam("b")->value();
+            Serial.print("B: ");
+            Serial.println(inputMessage);
+            newColor.b = atoi(inputMessage.c_str());
+        }
+        if (request->hasParam("l")) {
+            inputMessage = request->getParam("l")->value();
+            Serial.print("brightness: ");
+            Serial.println(inputMessage);
+            newBrightness = atoi(inputMessage.c_str());
+        }
+
+        baseColor = newColor;
+        brightness = newBrightness;
+        design = newDesign;
+
+        request->send_P(200, "text/html","ok");
     });
 
     server.on("/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
