@@ -31,6 +31,7 @@ var colorPicker = new iro.ColorPicker();
 var nightColorPicker = new iro.ColorPicker();
 
 $("document").ready(()=>{
+    window.socket = new WebSocket("ws://" + window.location.hostname + "/ws");
     $.get("api/config",function(data, status){
         if(status=="success"){
             if(!(typeof x === 'object' && !Array.isArray(x) && x !== null)){
@@ -51,10 +52,13 @@ $("document").ready(()=>{
                 ]
             });
             colorPicker.on("color:change", function(color) {
-                console.log("Primärfarbe:", color.hexString);
+                colString = color.rgbString.replaceAll(" ","");
+                colString = colString.substr(4,colString.length-5);
+                console.log(colString + "," + brightnessSlider.value);
                  // make edit actions available
                 const block = document.getElementById("ColorEdit");
                 block.classList.remove("opacity-50", "pointer-events-none");
+                socket.send(colString + "," + brightnessSlider.value)
             });
 
             // Mode

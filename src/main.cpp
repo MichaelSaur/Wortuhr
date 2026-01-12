@@ -20,12 +20,13 @@ Preferences preferences;
 bool APMode = false;
 bool NightMode = false;
 bool OTA = false;
-bool previewColorFullScreen = false;
+bool previewMode = false;
 unsigned long previewColorTriggerTimestamp = 0;
 String ssid;
 String password;
 DNSServer dnsServer;
 AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
 TaskHandle_t Task1;
 bool scanComplete = false;
 String KnownSSIDs[10];
@@ -175,78 +176,13 @@ void setup() {
 }
 
 void loop() {
-  if(!OTA){ 
-    if(!previewColorFullScreen){
+  if(!OTA){
+    ws.cleanupClients();
+    if(!previewMode){
       myTimeData.loop();
     }else{
-      if(design == "Solid"){
-        fill_solid(leds,NUM_LEDS,baseColor);
-      }
-      if(design == "Palette"){
-        // fill_solid(leds,NUM_LEDS,baseColor);
-        int delta = 30;
-        int delta4 = delta/4;
-        CRGB color;
-        CHSV basehue = rgb2hsv_approximate(baseColor);
-
-        // color = color.setHue(basehue.h-delta);
-        // fill_solid(leds,11,color);
-
-        // color = color.setHue(basehue.h-3*delta4);
-        // fill_solid(leds+11,11,color);
-
-        // color = color.setHue(basehue.h-2*delta4);
-        // fill_solid(leds+22,11,color);
-
-        // color = color.setHue(basehue.h-delta4);
-        // fill_solid(leds+33,11,color);
-
-        // fill_solid(leds+44,11,baseColor);
-        // fill_solid(leds+55,11,baseColor);
-
-        // color = color.setHue(basehue.h+delta4);
-        // fill_solid(leds+66,11,color);
-
-        // color = color.setHue(basehue.h+2*delta4);
-        // fill_solid(leds+77,11,color);
-
-        // color = color.setHue(basehue.h+3*delta4);
-        // fill_solid(leds+88,11,color);
-
-        // color = color.setHue(basehue.h+delta);
-        // fill_solid(leds+99,11,color);
-
-        color = color.setHue(basehue.h-delta);
-        leds[NUM_LEDS-4] = color;
-        leds[NUM_LEDS-3] = color;
-        fill_solid(leds,11,color);
-        fill_solid(leds+11,11,color);
-
-        fill_solid(leds+22,11,CRGB::Black);
-        fill_solid(leds+33,11,CRGB::Black);
-
-        fill_solid(leds+44,11,baseColor);
-        fill_solid(leds+55,11,baseColor);
-
-        fill_solid(leds+66,11,CRGB::Black);
-        fill_solid(leds+77,11,CRGB::Black);
-
-        color = color.setHue(basehue.h+delta);
-        fill_solid(leds+88,11,color);
-        fill_solid(leds+99,11,color);
-        leds[NUM_LEDS-2] = color;
-        leds[NUM_LEDS-1] = color;
-      }
-      if(design == "Random"){
-        fill_solid(leds,NUM_LEDS,baseColor);
-      }
-      if(design == "Rainbow"){
-        fill_rainbow(leds,NUM_LEDS,hue,deltaHueAllLEDs);
-      }
-      FastLED.setBrightness(brightness);
-      FastLED.show();
       if(millis() - previewColorTriggerTimestamp > 5000){
-        previewColorFullScreen = false;
+        previewMode = false;
         if(!NightMode){
           baseColor = baseColorDay;
           brightness = brightnessDay;

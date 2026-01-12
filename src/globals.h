@@ -14,7 +14,7 @@ extern Preferences preferences;
 // WIFi
 extern bool APMode;
 extern bool NightMode;
-extern bool previewColorFullScreen;
+extern bool previewMode;
 extern unsigned long previewColorTriggerTimestamp;
 extern String ssid;
 extern String password;
@@ -22,6 +22,7 @@ extern DNSServer dnsServer;
 extern AsyncWebServer server;
 extern String KnownSSIDs[10];
 extern String KnownSSIDsList;
+extern AsyncWebSocket ws;
 
 // Time
 extern const char* ntpServer;

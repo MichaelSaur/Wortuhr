@@ -9,8 +9,16 @@
 
 String getIndexHTML();
 String templateProcessor(const String& var);
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
+
+void initWebSocket() {
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
+}
 
 void setupServer(){
+    initWebSocket();
+
     server.serveStatic("/",SPIFFS,"/");
     server.onNotFound([](AsyncWebServerRequest *request){
         if (request->url() == "/"){
@@ -47,7 +55,7 @@ void setupServer(){
     });
 
     server.on("/api/previewColor",HTTP_GET, [] (AsyncWebServerRequest * request){
-        previewColorFullScreen = true;
+        previewMode = true;
         previewColorTriggerTimestamp = millis();
 
         String inputMessage;
@@ -305,6 +313,46 @@ void setupServer(){
         }
         request->redirect("/");
     });
+}
+
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    data[len] = 0;
+    String s = String((char *)data, len);
+    Serial.println(s);
+    int values[4];
+    int lastIndex = 0;
+    int index = 0;
+    for (int i = 0; i < 4; i++) {
+    index = s.indexOf(',', lastIndex);
+    if (index == -1) index = s.length();
+    values[i] = s.substring(lastIndex, index).toInt();
+    lastIndex = index + 1;
+    }
+    baseColor = CRGB(values[0],values[1],values[2]);
+    brightness = values[3];
+    FastLED.setBrightness(brightness);
+    myTimeData.updateColor();
+  }
+}
+
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+             void *arg, uint8_t *data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+      handleWebSocketMessage(arg, data, len);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
+  }
 }
 
 String templateProcessor(const String& var){
