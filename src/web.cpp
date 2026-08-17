@@ -22,23 +22,16 @@ void setupServer(){
     server.serveStatic("/",SPIFFS,"/");
     server.onNotFound([](AsyncWebServerRequest *request){
         if (request->url() == "/"){
-            request->send(SPIFFS,"/wortuhr.html","text/html",false,templateProcessor);
+            request->send(SPIFFS,"/wortuhr.html","text/html");
         }else{
             request->send(404);
         } 
     });
 
-    // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    //     //request->send(SPIFFS,);
-    //     String url = request->url();
-    //     if (url == "/"){
-    //         url = "/index.html";
-    //     }
-    //     Serial.println(url);
-    //     request->send(SPIFFS,url,String(),false,templateProcessor);
-    //     //request->send_P(200, "text/html", getIndexHTML().c_str()); 
-    //     //Serial.println("Client Connected");
-    // });
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(SPIFFS,"/wortuhr.html","text/html");
+    });
+
     server.on("/api/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
         String config = "{";
         config += "\"time\":"+ String(myTimeData.hour*60+ myTimeData.minute*60+myTimeData.second) + ",";
@@ -54,17 +47,17 @@ void setupServer(){
         request->send_P(200, "application/json", config.c_str()); 
     });
 
-    server.on("/api/previewColor",HTTP_GET, [] (AsyncWebServerRequest * request){
-        previewMode = true;
-        previewColorTriggerTimestamp = millis();
-
+    server.on("/api/dayColor",HTTP_GET, [] (AsyncWebServerRequest * request){
         String inputMessage;
         String newDesign;
         CRGB newColor;
         uint8_t newBrightness;
 
-        if (request->hasParam("d")) {
-            inputMessage = request->getParam("d")->value();
+        if (request->hasParam("mode")) {
+            inputMessage = request->getParam("mode")->value();
+            if(designOptions.indexOf(inputMessage) == -1){
+                request->send_P(400, "text/html","mode not available");
+            }
             newDesign = inputMessage;
             Serial.println(inputMessage);
         }
@@ -86,21 +79,35 @@ void setupServer(){
             Serial.println(inputMessage);
             newColor.b = atoi(inputMessage.c_str());
         }
-        if (request->hasParam("l")) {
-            inputMessage = request->getParam("l")->value();
+        if (request->hasParam("brightness")) {
+            inputMessage = request->getParam("brightness")->value();
             Serial.print("brightness: ");
             Serial.println(inputMessage);
             newBrightness = atoi(inputMessage.c_str());
         }
 
-        baseColor = newColor;
-        brightness = newBrightness;
-        design = newDesign;
+        preferences.begin("wortuhr",false);
+        preferences.putString("design",newDesign);
+        preferences.putInt("baseColorR",newColor.r);
+        preferences.putInt("baseColorG",newColor.g);
+        preferences.putInt("baseColorB",newColor.b);
+        preferences.putInt("brightness",newBrightness);
+        preferences.end();
+        designDay = newDesign;
+        baseColorDay = newColor;
+        brightnessDay = newBrightness;
+        if(!NightMode){
+            design = newDesign;
+            baseColor = newColor;
+            brightness = newBrightness;
+            FastLED.setBrightness(brightness);
+        }
+        myTimeData.updateColor();
 
         request->send_P(200, "text/html","ok");
     });
 
-    server.on("/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    server.on("/api/wifi", HTTP_GET, [] (AsyncWebServerRequest *request) {
         String inputMessage;
         String inputParam;
         String newSsid;
@@ -111,6 +118,8 @@ void setupServer(){
             inputParam = "ssid";
             newSsid = inputMessage;
             Serial.println(inputMessage);
+        }else{
+            request->send_P(400, "text/html","No SSID given");
         }
 
         if (request->hasParam("password")) {
@@ -118,17 +127,19 @@ void setupServer(){
             inputParam = "password";
             newPassword = inputMessage;
             Serial.println(inputMessage);
+        }else{
+            request->send_P(400, "text/html","No Password given");
         }
 
+        ssid = newSsid;
+        password = newPassword;
         preferences.begin("wortuhr",false);
         preferences.putString("ssid",newSsid);
         preferences.putString("password",newPassword);
         preferences.end();
-        ssid = newSsid;
-        password = newPassword;
 
-        request->redirect("/");
-        	
+        request->send_P(200, "text/html","ok");
+        delay(500);
         ESP.restart();
     });
 
@@ -321,19 +332,29 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     data[len] = 0;
     String s = String((char *)data, len);
     Serial.println(s);
-    int values[4];
-    int lastIndex = 0;
-    int index = 0;
-    for (int i = 0; i < 4; i++) {
-    index = s.indexOf(',', lastIndex);
-    if (index == -1) index = s.length();
-    values[i] = s.substring(lastIndex, index).toInt();
-    lastIndex = index + 1;
+    if(s.startsWith("day:")){
+        s = s.substring(4);
+        int values[4];
+        int lastIndex = 0;
+        int index = 0;
+        for (int i = 0; i < 4; i++) {
+        index = s.indexOf(',', lastIndex);
+        if (index == -1) index = s.length();
+        values[i] = s.substring(lastIndex, index).toInt();
+        lastIndex = index + 1;
+        }
+        Serial.print(values[0]);
+        Serial.print(",");
+        Serial.print(values[1]);
+        Serial.print(",");
+        Serial.print(values[2]);
+        Serial.print(",");
+        Serial.println(values[3]);
+        baseColor = CRGB(values[0],values[1],values[2]);
+        brightness = values[3];
+        FastLED.setBrightness(brightness);
+        myTimeData.updateColor();
     }
-    baseColor = CRGB(values[0],values[1],values[2]);
-    brightness = values[3];
-    FastLED.setBrightness(brightness);
-    myTimeData.updateColor();
   }
 }
 

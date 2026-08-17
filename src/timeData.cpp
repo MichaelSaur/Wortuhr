@@ -105,7 +105,7 @@ void TimeData::loop(){
 
 void TimeData::animate(){
     int numUpdates = 0;
-    if(design == "Solid"){
+    if(design == "Static"){
         for(int j=0; j<20;j++){
             for(int i=0; i<NUM_LEDS; i++){
                 if(updatedLEDs[i]){

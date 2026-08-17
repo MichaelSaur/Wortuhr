@@ -34,15 +34,13 @@ $("document").ready(()=>{
     window.socket = new WebSocket("ws://" + window.location.hostname + "/ws");
     $.get("api/config",function(data, status){
         if(status=="success"){
-            if(!(typeof x === 'object' && !Array.isArray(x) && x !== null)){
-                data = JSON.parse(data);
-                window.config = data;
-            }
+            //data = JSON.parse(data);
+            window.config = data;
             console.log(data)
             clockTime = data.time*1000
             
             // iro.js Color Picker – Hauptfarbe
-            colorString = 'rgb(' + data.baseColor.r + ',' + data.baseColor.g + ',' + data.baseColor.b + ')'
+            colorString = 'rgb(' + data.baseColor.r + ',' + data.baseColor.g + ',' + data.baseColor.b + ')';
             colorPicker = new iro.ColorPicker("#colorPicker", {
                 width: 250,
                 color: colorString,
@@ -58,7 +56,7 @@ $("document").ready(()=>{
                  // make edit actions available
                 const block = document.getElementById("ColorEdit");
                 block.classList.remove("opacity-50", "pointer-events-none");
-                socket.send(colString + "," + brightnessSlider.value)
+                socket.send("day:"+colString + "," + brightnessSlider.value)
             });
 
             // Mode
@@ -211,7 +209,12 @@ ColorReset.addEventListener("click", function() {
 const ColorSave = document.getElementById("ColorSave");
 ColorSave.addEventListener("click", function() {
     // send new data to clock
-
+     $.get("api/dayColor?mode=" + colorMode.value + "&r=" + colorPicker.color.red + "&g=" + colorPicker.color.green + "&b=" + colorPicker.color.blue + "&brightness=" + brightnessSlider.value, function(data, status){
+         if(status != "success"){
+            alert("failed to save data");
+            console.error("failed to save data",data,status)
+         }
+    });
     // make edit actions gray again
     const block = document.getElementById("ColorEdit");
     block.classList.add("opacity-50", "pointer-events-none");
@@ -331,7 +334,12 @@ wiFiReset.addEventListener("click", function() {
 const wiFiSave = document.getElementById("WiFiSave");
 wiFiSave.addEventListener("click", function() {
     // send new data to clock
-
+    $.get("api/wifi?ssid=" + wiFiSSID.value + "&password=" + wiFiPasswd.value, function(data, status){
+         if(status != "success"){
+            alert("failed to save data");
+            console.error("failed to save data",data,status)
+         }
+    });
     // make edit actions gray again
     const block = document.getElementById("WiFiEdit");
     block.classList.add("opacity-50", "pointer-events-none");
